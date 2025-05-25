@@ -2,13 +2,13 @@ name: Android CI
 
 on:
   push:
-    branches: [ "master" ]  # 触发分支
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # 使用最新 Ubuntu 环境
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -22,24 +22,12 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
-        # 自动安装 Android SDK 和构建工具
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease  # 执行 Gradle 构建
-
-      - name: Sign APK (Optional)
-        if: success() && github.event_name == 'push'  # 仅对 push 事件签名
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          cp ${{ secrets.KEYSTORE }} ./app/mnml.jks  # 从 Secrets 加载 Keystore
-          ./gradlew signingReport  # 验证签名配置
-          ./gradlew assembleRelease
+        run: ./gradlew assembleRelease
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # 使用 v4 版本
         with:
-          name: mnml-screen-recorder
+          name: mnml-apk
           path: app/build/outputs/apk/release/app-release.apk
